@@ -1,49 +1,70 @@
-import { app as s, BrowserWindow as c, Menu as u } from "electron";
-import { fileURLToPath as R } from "node:url";
-import e from "node:path";
-import { spawn as _ } from "node:child_process";
-const a = e.dirname(R(import.meta.url));
-process.env.APP_ROOT = e.join(a, "..");
-const t = process.env.VITE_DEV_SERVER_URL, h = e.join(process.env.APP_ROOT, "dist-electron"), d = e.join(process.env.APP_ROOT, "dist");
-process.env.VITE_PUBLIC = t ? e.join(process.env.APP_ROOT, "public") : d;
-let o, n = null;
-function p() {
-  u.setApplicationMenu(null), o = new c({
-    icon: e.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
+import { app, BrowserWindow, Menu } from "electron";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
+import { spawn } from "node:child_process";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+process.env.APP_ROOT = path.join(__dirname, "..");
+const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
+const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
+const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
+process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, "public") : RENDERER_DIST;
+let win;
+let goServerProcess = null;
+function createWindow() {
+  Menu.setApplicationMenu(null);
+  win = new BrowserWindow({
+    icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     webPreferences: {
-      preload: e.join(a, "preload.mjs")
+      preload: path.join(__dirname, "preload.mjs")
     }
-  }), o.webContents.on("did-finish-load", () => {
-    o == null || o.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
-  }), t ? o.loadURL(t) : o.loadFile(e.join(d, "index.html"));
+  });
+  win.webContents.on("did-finish-load", () => {
+    win == null ? void 0 : win.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
+  });
+  if (VITE_DEV_SERVER_URL) {
+    win.loadURL(VITE_DEV_SERVER_URL);
+  } else {
+    win.loadFile(path.join(RENDERER_DIST, "index.html"));
+  }
 }
-function v() {
-  var i, l;
-  const m = e.join(process.resourcesPath, "go-server.exe");
-  n = _(m, [], {
+function startGoServer() {
+  var _a, _b;
+  const goServerPath = path.join(process.resourcesPath, "go-server.exe");
+  goServerProcess = spawn(goServerPath, [], {
     cwd: process.resourcesPath,
     // 工作目录可以和 go-server.exe 放一起
-    detached: !0
+    detached: true
     // 可选：为了在主进程退出后也能继续独立运行
-  }), (i = n.stdout) == null || i.on("data", (r) => {
-    console.log(`go-server output: ${r}`);
-  }), (l = n.stderr) == null || l.on("data", (r) => {
-    console.error(`go-server error: ${r}`);
-  }), n.on("close", (r) => {
-    console.log(`go-server process exited with code ${r}`);
+  });
+  (_a = goServerProcess.stdout) == null ? void 0 : _a.on("data", (data) => {
+    console.log(`go-server output: ${data}`);
+  });
+  (_b = goServerProcess.stderr) == null ? void 0 : _b.on("data", (data) => {
+    console.error(`go-server error: ${data}`);
+  });
+  goServerProcess.on("close", (code) => {
+    console.log(`go-server process exited with code ${code}`);
   });
 }
-s.on("window-all-closed", () => {
-  process.platform !== "darwin" && (n == null || n.kill(), n = null, s.quit(), o = null);
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    goServerProcess == null ? void 0 : goServerProcess.kill();
+    goServerProcess = null;
+    app.quit();
+    win = null;
+  }
 });
-s.on("activate", () => {
-  c.getAllWindows().length === 0 && p();
+app.on("activate", () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
 });
-s.whenReady().then(() => {
-  v(), p();
+app.whenReady().then(() => {
+  startGoServer();
+  createWindow();
 });
 export {
-  h as MAIN_DIST,
-  d as RENDERER_DIST,
-  t as VITE_DEV_SERVER_URL
+  MAIN_DIST,
+  RENDERER_DIST,
+  VITE_DEV_SERVER_URL
 };
