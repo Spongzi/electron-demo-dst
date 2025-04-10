@@ -1,7 +1,7 @@
 {
   "name": "my-electron-vite-project",
   "private": true,
-  "version": "0.0.6",
+  "version": "0.0.7",
   "type": "module",
   "productName": "demo",
   "scripts": {
