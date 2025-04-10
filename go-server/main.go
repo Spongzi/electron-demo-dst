@@ -97,7 +97,8 @@ func initModbusClient(ip string, port string) {
 	if port == "" {
 		port = "502"
 	}
-	fmt.Println(ip)
+	// fmt.Println(ip)
+
 	// handler := modbus.NewTCPClientHandler(ip + ":" + port) // 替换为实际地址
 	// //handler := modbus.NewTCPClientHandler("127.0.0.1" + ":502") // 替换为实际地址
 	// // handler.Timeout = 50 * time.Millisecond
@@ -159,10 +160,10 @@ func handleWebSocket(c *gin.Context) {
 					log.Println("收到按钮点击事件")
 					// 这里可以执行相关逻辑
 					// 上锁
-					fmt.Println("进行写操作")
+					// fmt.Println("进行写操作")
 					sendCustomCommand()
 					// 解锁
-					fmt.Println("写操作完成")
+					// fmt.Println("写操作完成")
 				}
 			}
 		}
