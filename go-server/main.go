@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -45,6 +46,9 @@ var clients = make(map[*websocket.Conn]bool)
 
 // 添加停止通道
 var stopBroadcast = make(chan struct{})
+
+// 用于等待 broadcastData 停止
+var broadcastStopped = sync.WaitGroup{}
 
 func Cors() gin.HandlerFunc {
 	return func(context *gin.Context) {
@@ -113,6 +117,7 @@ func initModbusClient(ip string, port string) {
 
 	// 启动数据读取和广播的 goroutine
 	go broadcastData()
+	broadcastStopped.Add(1) // 增加等待计数
 
 	modbusClient = modbus.NewClient(modbusHandler)
 }
@@ -171,7 +176,8 @@ func handleWebSocket(c *gin.Context) {
 
 func closeModbusServer(ctx *gin.Context) {
 	// 停止 broadcastData goroutine
-	close(stopBroadcast) // 发送停止信号
+	close(stopBroadcast)    // 发送停止信号
+	broadcastStopped.Wait() // 等待 broadcastData 停止
 	// 关闭 Modbus 连接
 	if modbusHandler != nil {
 		err := modbusHandler.Close()
@@ -195,6 +201,7 @@ func closeModbusServer(ctx *gin.Context) {
 	}
 
 	stopBroadcast = make(chan struct{}) // 重置通道
+	broadcastStopped.Add(1)             // 重置等待计数
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"code": 200,
@@ -221,11 +228,16 @@ func connectModbusServer(ctx *gin.Context) {
 
 // 广播数据到所有客户端
 func broadcastData() {
+	defer broadcastStopped.Done() // 确保退出时减少等待计数
 	pollInterval := 30 * time.Millisecond
 	for {
 		select {
 		case <-stopBroadcast: // 监听停止信号
 			log.Println("停止广播数据")
+			if modbusHandler == nil {
+				log.Println("modbusHandler 已关闭，停止广播")
+				return
+			}
 			return // 退出 goroutine
 		default:
 			// 读取 Modbus 数据
@@ -241,7 +253,7 @@ func broadcastData() {
 				log.Printf("JSON 编码失败: %v", err)
 				continue
 			}
-			fmt.Println(jsonData)
+			// fmt.Println(jsonData)
 
 			// 广播给所有客户端
 			for clientConn := range clients {
@@ -255,6 +267,7 @@ func broadcastData() {
 			time.Sleep(pollInterval)
 		}
 	}
+
 }
 
 // 读取 Modbus 数据
