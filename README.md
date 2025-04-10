@@ -28,7 +28,7 @@ electron-demo-dst/
 ```
 
 ## 技术栈
-- 前端：​React、TypeScript、Vite
+- 前端：​React、TypeScript、Vite、node版本位20.19
 - 后端：​Golang
 - 构建工具：​Electron、Electron-builder
 
