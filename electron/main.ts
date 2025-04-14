@@ -3,6 +3,7 @@ import { app, BrowserWindow, Menu } from "electron";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { spawn } from "node:child_process";
+import * as os from "os";   // zjx
 
 // const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -54,10 +55,18 @@ function createWindow(): void {
 }
 
 function startGoServer() {
-  // Go 后端可执行文件的路径
-  // 在打包后会位于 process.resourcesPath 下，
-  // 如果你在 extraResources 中的 to 设置为 ".", 则表示文件在 resources/ 下
-  const goServerPath = path.join(process.resourcesPath, "go-server.exe");
+//   // Go 后端可执行文件的路径
+//   // 在打包后会位于 process.resourcesPath 下，
+//   // 如果你在 extraResources 中的 to 设置为 ".", 则表示文件在 resources/ 下
+//   const goServerPath = path.join(process.resourcesPath, "go-server.exe");
+
+    const arch = os.arch(); // 'x64' or 'ia32'
+    // 选择对应架构的可执行文件名
+    const goServerPath = path.join(
+        process.resourcesPath,
+        arch === "x64" ? "x64" : "ia32",
+        "go-server.exe"
+    );   
 
   // 使用 spawn 或 execFile 来启动
   goServerProcess = spawn(goServerPath, [], {

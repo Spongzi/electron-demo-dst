@@ -38,7 +38,7 @@ electron-demo-dst/
 - 后端使用 Golang，确保高性能和可靠性。
 
 ## 开发指南
-1. 安装依赖：使用 npm 或 yarn 安装依赖。
+1. 安装依赖：使用 npm 或 yarn 安装依赖（根据package.json）。
 ```nodejs
 npm install
 ```
@@ -47,16 +47,20 @@ npm install
 npm run dev
 ```
 
-3. 构建项目：
+3. 构建项目：（打包前后端，包括32位和64位两个版本）
 ```nodejs
 npm run build
 ```
-4. 运行 Electron：
-```nodejs
-npm run electron
-```
+## 注意事项
+
+1、~~打包前后端前，需要先编译生成go后端32位和64位版本的可执行程序，放到 `resource\go-server\` 对应的文件夹下，并将可执行程序命名为 `go-server.exe`，打包时会拷贝过去~~ （已经添加到 `build` 脚本当中）
+
+2、以管理员身份打开cmd，否则打包前后端时可能会报错
+
+3、打包完成后会在 `release` 中生成：ia32免安装版、x64免安装版、ia32安装版、x64安装版 和 自动识别合适版本的安装程序。
 
 # 贡献指南
+
 欢迎提交 Issues 和 Pull Requests。请确保您的代码符合项目的编码规范，并通过了所有测试。
 
 # 联系方式
