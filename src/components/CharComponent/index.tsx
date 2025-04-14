@@ -42,10 +42,10 @@ function ChartComponent(): JSX.Element {
     pressure: 0,
     displacement: 0,
   });
-  // 初始化连接参数
+  // 初始化（Modbus TCP从站）连接参数
   const [connectionParams, setConnectionParams] = useState<ConnectionParams>({
-    ip: "localhost",
-    port: "8080",
+    ip: "192.168.2.89",
+    port: "502",
   });
   // 初始化状态
   const [isConnected, setIsConnected] = useState(false);

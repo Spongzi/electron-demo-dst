@@ -1,8 +1,8 @@
 /**
-一个 Web 后端程序，功能是：
-1、接收前端请求来连接一个 Modbus TCP设备
-2、通过 WebSocket 实时将 Modbus 读取到的传感器数据发送给前端
-3、支持通过 WebSocket 接收“按钮点击”事件并向 Modbus 发送指令
+	一个 Web 后端程序，功能是：
+	1、接收前端请求来连接一个 Modbus TCP设备
+	2、通过 WebSocket 实时将 Modbus 读取到的传感器数据发送给前端
+	3、支持通过 WebSocket 接收“按钮点击”事件并向 Modbus 发送指令
 **/
 
 package main
