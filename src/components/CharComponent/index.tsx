@@ -60,13 +60,13 @@ function ChartComponent(): JSX.Element {
   // 同步isTestingRef的值
   useEffect(() => {
     isTestingRef.current = isTesting;
-    console.log("isTesting changed to:", isTesting);
+    // console.log("isTesting changed to:", isTesting);
   }, [isTesting]);
 
   // 同步 currentPressIdRef
   useEffect(() => {
     currentPressIdRef.current = currentPressId;
-    console.log("currentPressId changed to:", currentPressId);
+    // console.log("currentPressId changed to:", currentPressId);
   }, [currentPressId]);
 
   // 处理输入框变化
@@ -106,7 +106,7 @@ function ChartComponent(): JSX.Element {
 
   // 开始/停止测试
   const toggleTesting = () => {
-    console.log("toggleTesting called, current isTesting:", isTesting);
+    // console.log("toggleTesting called, current isTesting:", isTesting);
     if (!isConnected) {
       message.warning("请先连接WebSocket");
       return;
@@ -114,10 +114,6 @@ function ChartComponent(): JSX.Element {
     message.success("开始/停止测试");
     setIsTesting((prev) => !prev);
   };
-
-  useEffect(() => {
-    console.log("isTesting changed to:", isTesting);
-  }, [isTesting]);
 
   // 连接WebSocket
   const connectWebSocket = () => {
@@ -135,7 +131,7 @@ function ChartComponent(): JSX.Element {
       };
 
       wsRef.current.onmessage = (messageEvent) => {
-        console.log("-----------" + isTestingRef.current);
+        // console.log("-----------" + isTestingRef.current);
 
         if (!isTestingRef.current) return; // 如果不在测试状态，不处理数据
 
@@ -143,21 +139,21 @@ function ChartComponent(): JSX.Element {
           const data: DataMessage = JSON.parse(messageEvent.data);
           const { press_id, position, pressure, displacement } = data;
 
-          console.log("接收到数据:", data);
+          // console.log("接收到数据:", data);
 
           setChildData({ position, pressure, displacement });
 
           if (press_id !== currentPressIdRef.current) {
-            console.log("press_id 变化，清除 chartData");
+            // console.log("press_id 变化，清除 chartData");
             setCurrentPressId(press_id);
-            console.log("currentPressId 更新为:", currentPressId);
+            // console.log("currentPressId 更新为:", currentPressId);
             setChartData([{ position, pressure }]);
           } else {
-            console.log("press_id 未变，追加数据");
+            // console.log("press_id 未变，追加数据");
             // setChartData((prev) => [...prev, { position, pressure }]);
             setChartData((prev) => {
               const newData = [...prev, { position, pressure }];
-              console.log("chartData 更新为:", newData);
+              // console.log("chartData 更新为:", newData);
               return newData;
             });
           }
@@ -167,7 +163,7 @@ function ChartComponent(): JSX.Element {
       };
 
       wsRef.current.onclose = () => {
-        console.log("WebSocket 连接已关闭");
+        // console.log("WebSocket 连接已关闭");
         setIsConnected(false);
         setIsTesting(false);
       };
