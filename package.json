@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "tsc && vite build && electron-builder --win --x64 --ia32",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build-go": "cd go-server && go mod download && set GOARCH=386&& set GOOS=windows&& go build -v -o ../resource/go-server/x86/go-server.exe ."
   },
   "build": {
     "asar": true,
@@ -17,7 +18,7 @@
     },
     "extraResources": [
       {
-        "from": "resource/go-server/win32-amd64/go-server.exe",
+        "from": "resource/go-server/x86/go-server.exe",
         "to": "."
       }
     ],
