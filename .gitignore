@@ -23,8 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 
-# 忽略 resource 文件夹中的所有内容，但 不忽略这个文件夹本身
-resource/*
-release/*       
+# 忽略 resource 文件夹中的所有内容，包括文件夹本身
+resource
+release
 
 *.exe
