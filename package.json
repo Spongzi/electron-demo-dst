@@ -6,10 +6,11 @@
   "productName": "demo",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && electron-builder --win --x64 --ia32",
+    "build": "npm run build-go-ia32 && npm run build-go-x64 && tsc && vite build && electron-builder --win --x64 --ia32",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "build-go": "cd go-server && go mod download && set GOARCH=386&& set GOOS=windows&& go build -v -o ../resource/go-server/x86/go-server.exe ."
+    "build-go-ia32": "cd go-server && go mod download && set GOARCH=386&& set GOOS=windows&& go build -v -o ../resource/go-server/ia32/go-server.exe .",
+    "build-go-x64": "cd go-server && go mod download && set GOARCH=amd64&& set GOOS=windows&& go build -v -o ../resource/go-server/x64/go-server.exe ."
   },
   "build": {
     "asar": true,
@@ -18,9 +19,9 @@
     },
     "extraResources": [
       {
-        "from": "resource/go-server/x86/go-server.exe",
-        "to": "."
-      }
+        "from": "resource/go-server/${arch}/go-server.exe",
+        "to": "${arch}/go-server.exe"
+      }    
     ],
     "files": [
       "dist-electron/**/*",
