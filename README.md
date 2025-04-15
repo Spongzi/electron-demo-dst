@@ -2,6 +2,8 @@
 
 该项目旨在使用 Electron 将前后端统一打包成安装包，并兼容 32 位操作系统。前端采用 React 和 TypeScript，后端使用 Golang。
 
+![](./assets/effect.gif)
+
 ## 项目结构
 
 ```plaintext
